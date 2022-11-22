@@ -14,6 +14,7 @@ nouns = {x.name().split('.', 1)[0] for x in wn.all_synsets('n')}
 
 train_set = brown.sents()
 model = gensim.models.Word2Vec(train_set)
+print(len(model.wv))
 model.save('brown.embedding')
 
 board_words = [

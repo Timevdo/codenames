@@ -9,10 +9,15 @@ NUM_BLUE_WORDS = 5
 NUM_RED_WORDS = 5
 
 def generate_board():
-    bwfl = open('board_words.bin', 'rb')
-    board_words_list = pickle.load(bwfl)
+    #bwfl = open('board_words.bin', 'rb')
+    #board_words_list = pickle.load(bwfl)
+
+    bwfl = open('wordlist-eng.txt', 'r')
+    board_words_list = bwfl.readlines()
+    board_words_list = [w[0:len(w)-1].lower() for w in board_words_list]
 
     board_words = np.array(random.sample(board_words_list, 25))
+    #print(board_words)
 
     blue_idx = set(random.sample(range(25), NUM_BLUE_WORDS))
     red_idx = set(random.sample(set(range(25)) - blue_idx, NUM_RED_WORDS))
@@ -69,7 +74,7 @@ def player_cluegiver(board):
         clue = input(Fore.RESET + "Enter Clue: ")
         n = input("Enter Number: ")
 
-        guesses = algs.w2v_guess_from_clue(board, clue, n)
+        guesses = algs.ft_guess_from_clue(board, clue, int(n))
 
         for g in guesses:
             board[3][board[0].tolist().index(g[0])] = True
