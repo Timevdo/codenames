@@ -85,4 +85,16 @@ def player_cluegiver(board):
 
 
 board = generate_board()
-player_cluegiver(board)
+#player_cluegiver(board)
+print_hidden_board(board)
+clue = algs.ft_generate_clue_v2(board)
+print(clue)
+
+guesses = algs.ft_guess_from_clue(board, clue[0], clue[1])
+
+for g in guesses:
+    board[3][board[0].tolist().index(g[0])] = True
+
+print("Computer Guessed", guesses)
+print_player_board(board)
+print("\n")

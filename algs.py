@@ -1,4 +1,5 @@
 from nltk.corpus import wordnet as wn
+from nltk.corpus import words
 
 #from nltk.data import find
 #from nltk.test.gensim_fixt import setup_module
@@ -74,3 +75,64 @@ def ft_guess_from_clue(board, clue, n):
     guesses = sorted(guesses, key= lambda g : g[1], reverse=True)
     #print(guesses)
     return guesses[0:int(n)]
+
+wordset = set(words.words())
+
+def is_valid_clue(clue, board):
+    valid = True
+    for b in board[0]:
+        if clue.lower() not in wordset or b.lower() in clue.lower() or clue.lower() in b.lower():
+            valid = False
+    return valid
+
+def ft_generate_clue_v1(board):
+    blue_words = [w for i, w in enumerate(board[0]) if board[1][i] == "True"]
+
+    clues = []
+    for i in range(2, len(blue_words) + 1):
+        for c in itertools.combinations(blue_words, i):
+            print("Iteration: ", i, c)
+            c = list(c)
+            best_match = ft_model.most_similar(positive=c, k=20)
+            for b in best_match:
+                if is_valid_clue(b[0], board):
+                    clues += [(b[0], b[1], c, len(c))]
+                    break
+
+    clues = sorted(clues, key= lambda g : g[1], reverse=True)
+    print(clues)
+    return clues[0]
+        
+
+def ft_generate_clue_v2(board):
+    blue_words = [w for i, w in enumerate(board[0]) if board[1][i] == "True"]
+    red_words = [w for i, w in enumerate(board[0]) if board[2][i] == "True"]
+
+    clues = []
+    for i in range(1, len(blue_words) + 1):
+        for c in itertools.combinations(blue_words, i):
+            print("Iteration: ", i, c)
+            c = list(c)
+            best_match = ft_model.most_similar(positive=c, k=30)
+            for b in best_match:
+                if is_valid_clue(b[0], board):
+                    clues.append(b[0])
+
+    #print(clues)
+
+    best = ("Fuck off", 0)
+    for j, c in enumerate(clues):
+        print(j, end='\r')
+        for i in range(1, len(blue_words) + 1):
+            guess = ft_guess_from_clue(board, c, i)
+            #print(guess)
+            correct = True
+            for g in guess:
+                if g[0] not in blue_words:
+                    correct = False
+            if correct and i > best[1]:
+                best = (c, i, guess)
+    
+    return best
+        
+
