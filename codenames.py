@@ -5,8 +5,8 @@ import random
 
 import algs
 
-NUM_BLUE_WORDS = 5
-NUM_RED_WORDS = 5
+NUM_BLUE_WORDS = 9
+NUM_RED_WORDS = 8
 
 def generate_board():
     #bwfl = open('board_words.bin', 'rb')
@@ -49,6 +49,7 @@ def print_hidden_board(input_board):
             else:
                 rowstr += Fore.RESET+ f"{word:<15}"
         print(rowstr)
+    print(Fore.RESET)
         
 def print_player_board(input_board):
     board = np.stack([np.reshape(l, (5,5)) for l in input_board])
@@ -66,6 +67,7 @@ def print_player_board(input_board):
             else:
                 rowstr += Fore.RESET+ f"{word:<15}"
         print(rowstr)
+    print(Fore.RESET)
 
 def player_cluegiver(board):
     while True:
@@ -74,27 +76,107 @@ def player_cluegiver(board):
         clue = input(Fore.RESET + "Enter Clue: ")
         n = input("Enter Number: ")
 
-        guesses = algs.ft_guess_from_clue(board, clue, int(n))
+        guesses = algs.ft_guess_from_clue_prob(board, clue, int(n))
 
         for g in guesses:
-            board[3][board[0].tolist().index(g[0])] = True
+            board[3][board[0].tolist().index(g)] = True
 
         print("Computer Guessed", guesses)
         print_player_board(board)
         print("\n")
 
+def player_guesser(board):
+    blue_words = [w for i, w in enumerate(board[0]) if board[1][i] == "True"]
+    past_clues = []
+
+    while True:
+        print_player_board(board)
+
+        clue, n, _ = algs.ft_generate_clue_v2(board, past_clues)
+        past_clues += [clue]
+        #print(past_clues)
+
+        print("Computer Says: ",clue, n)
+        assert clue.lower() in algs.wordset
+
+        guess = ""
+        i = 0
+        while guess != "DONE" and i <= n:
+            guess = input("Guess: ")
+            if guess == "DONE":
+                break
+            if guess == "QUIT":
+                print_hidden_board(board)
+                return
+
+            board[3][board[0].tolist().index(guess)] = True
+            print_player_board(board)
+
+            if guess not in blue_words:
+                break
+        print('\n\n')
+
+def single_player(board):
+    past_clues = []
+
+    while True:
+        blue_words = [w for i, w in enumerate(board[0]) if board[1][i] == "True" and board[3][i] == "False"]
+        print("BLUE TEAM PLAYS:")
+        print_player_board(board)
+        clue, n, _ = algs.ft_generate_clue_v2(board, past_clues, blue_team=True)
+        past_clues += [clue]
+
+        print("BLUE TEAM CLUE: ",clue, n)
+        assert clue.lower() in algs.wordset
+
+        guess = ""
+        i = 0
+        while guess != "DONE" and i <= n:
+            guess = input("Guess: ")
+            if guess == "DONE":
+                break
+            if guess == "QUIT":
+                print_hidden_board(board)
+                return
+
+            board[3][board[0].tolist().index(guess)] = True
+            print_player_board(board)
+
+            if guess not in blue_words:
+                break
+
+        blue_words = [w for i, w in enumerate(board[0]) if board[1][i] == "True" and board[3][i] == "False"]
+        if blue_words == []:
+            print("BLUE TEAM WINS")
+            break
+        print('\n\n')
+
+        red_words = [w for i, w in enumerate(board[0]) if board[2][i] == "True" and board[3][i] == "False"]
+
+        print("RED TEAM PLAYS:")
+        print_player_board(board)
+        clue, n, _ = algs.ft_generate_clue_v2(board, past_clues, blue_team=False)
+        past_clues += [clue]
+        print("RED TEAM CLUE: ",clue, n)
+        assert clue.lower() in algs.wordset
+
+        guesses = algs.ft_guess_from_clue_prob(board, clue, n)
+        print("RED TEAM GUESSES: ", guesses)
+        for g in guesses:
+            board[3][board[0].tolist().index(g)] = True
+            if g not in red_words:
+                break
+        print_player_board(board)
+        red_words = [w for i, w in enumerate(board[0]) if board[2][i] == "True" and board[3][i] == "False"]
+        if red_words == []:
+            print("RED TEAM WINS")
+            break
+        print('\n\n')
+
+    print_hidden_board(board)
+
 
 board = generate_board()
+#player_guesser(board)
 #player_cluegiver(board)
-print_hidden_board(board)
-clue = algs.ft_generate_clue_v2(board)
-print(clue)
-
-guesses = algs.ft_guess_from_clue(board, clue[0], clue[1])
-
-for g in guesses:
-    board[3][board[0].tolist().index(g[0])] = True
-
-print("Computer Guessed", guesses)
-print_player_board(board)
-print("\n")
+single_player(board)
