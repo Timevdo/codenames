@@ -120,22 +120,7 @@ def ft_generate_clue_v2(board, past_clues=[], show_progress=True, blue_team=True
     clues = []
     iter = 0
     N = min(len(good_words) + 1, 6)
-    print(N)
-    '''
-    for i in range(1, N):
-        for j, c in enumerate(itertools.combinations(good_words, i)):
-            if show_progress:
-                prog.set_stat(iter/1000 * 100)
-                prog.update()
-            iter += 1
-
-            c = list(c)
-            best_match = ft_model.most_similar(positive=c, k=20)
-            #assert len(best_match) == 50
-            for b in best_match:
-                if is_valid_clue(b[0], board, past_clues):
-                    clues.append(b[0])
-    '''
+    
     best_match = ft_model.most_similar(positive=good_words, k=500)
     for b in best_match:
         if is_valid_clue(b[0], board, past_clues):
@@ -143,8 +128,6 @@ def ft_generate_clue_v2(board, past_clues=[], show_progress=True, blue_team=True
     #print(clues)
     if show_progress:
         prog.end()
-
-    print(len(clues))
 
     best = ("NO CLUE", 0, [])
     for j, c in enumerate(clues):
