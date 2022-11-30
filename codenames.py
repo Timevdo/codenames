@@ -8,7 +8,7 @@ import algs
 NUM_BLUE_WORDS = 9
 NUM_RED_WORDS = 8
 
-def generate_board():
+def generate_board(words=None, color_map=None):
     #bwfl = open('board_words.bin', 'rb')
     #board_words_list = pickle.load(bwfl)
 
@@ -16,20 +16,34 @@ def generate_board():
     board_words_list = bwfl.readlines()
     board_words_list = [w[0:len(w)-1].lower() for w in board_words_list]
 
-    board_words = np.array(random.sample(board_words_list, 25))
-    #print(board_words)
-
-    blue_idx = set(random.sample(range(25), NUM_BLUE_WORDS))
-    red_idx = set(random.sample(set(range(25)) - blue_idx, NUM_RED_WORDS))
+    if words is None:
+        board_words = np.array(random.sample(board_words_list, 25))
+    else:
+        board_words = words.flatten()
 
     blue_arr = np.full(25, False)
     red_arr = np.full(25, False)
     revealed = np.full(25, False)
 
-    for i in blue_idx:
-        blue_arr[i] = True
-    for i in red_idx:
-        red_arr[i] = True
+    if color_map is None:
+        blue_idx = set(random.sample(range(25), NUM_BLUE_WORDS))
+        red_idx = set(random.sample(set(range(25)) - blue_idx, NUM_RED_WORDS))
+
+        for i in blue_idx:
+            blue_arr[i] = True
+        for i in red_idx:
+            red_arr[i] = True
+    else:
+        for i, c in enumerate(color_map.flatten()):
+            if c.upper() == "BLUE":
+                blue_arr[i] = True
+            elif c.upper() == "RED":
+                red_arr[i] = True
+            elif c.upper() == "WHITE":
+                pass
+            else:
+                print("failed to generate board")
+                return None
 
     board = np.stack([board_words, blue_arr, red_arr, revealed])
 
@@ -176,7 +190,8 @@ def single_player(board):
     print_hidden_board(board)
 
 
-board = generate_board()
-#player_guesser(board)
-#player_cluegiver(board)
-single_player(board)
+if __name__ == "__main__":
+    board = generate_board()
+    #player_guesser(board)
+    #player_cluegiver(board)
+    single_player(board)
