@@ -1,0 +1,6 @@
+nltk
+pyprog
+pyfasttext
+colorama
+fasttext
+numpy

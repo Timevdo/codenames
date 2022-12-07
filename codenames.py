@@ -1,6 +1,5 @@
 from colorama import Fore, Back, Style
 import numpy as np
-import pickle
 import random
 
 import algs
@@ -9,9 +8,6 @@ NUM_BLUE_WORDS = 9
 NUM_RED_WORDS = 8
 
 def generate_board(words=None, color_map=None):
-    #bwfl = open('board_words.bin', 'rb')
-    #board_words_list = pickle.load(bwfl)
-
     bwfl = open('wordlist-eng.txt', 'r')
     board_words_list = bwfl.readlines()
     board_words_list = [w[0:len(w)-1].lower() for w in board_words_list]
