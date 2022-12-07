@@ -4,3 +4,4 @@ pyfasttext
 colorama
 fasttext
 numpy
+cython
