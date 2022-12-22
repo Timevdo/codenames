@@ -1,4 +1,7 @@
 import fasttext.util
+import nltk
+
+nltk.download('words')
 
 fasttext.util.download_model('en', if_exists='ignore')
 
